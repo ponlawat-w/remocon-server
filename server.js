@@ -15,10 +15,12 @@ const senderServer = Https.createServer(credentials, new Express());
 const receiverServer = Https.createServer(credentials, new Express());
 
 const wsSenderServer = new WebSocketServer({
-    server: senderServer
+    server: senderServer,
+    path: '/sender'
 });
 const wsReceiverServer = new WebSocketServer({
-    server: receiverServer
+    server: receiverServer,
+    path: '/receiver'
 });
 
 wsSenderServer.on('connection', (ws) => {
@@ -32,7 +34,7 @@ wsSenderServer.on('connection', (ws) => {
         wsReceiverServer.clients.forEach((ws) => {
             ws.send(msg);
         });
-        
+
         console.log(`Forward message to receiver: ${msg}`);
     });
 });
