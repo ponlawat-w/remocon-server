@@ -1,0 +1,19 @@
+{
+  "name": "remocon-server",
+  "version": "1.0.0",
+  "description": "Remocon Server",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ".git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.3",
+    "ws": "^5.2.1"
+  }
+}
