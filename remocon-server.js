@@ -31,6 +31,11 @@ wsSenderServer.on('connection', (ws) => {
     });
 
     ws.on('message', (msg) => {
+        if (msg === "RECEVIERS_COUNT") {
+            ws.send(wsReceiverServer.clients.size);
+            return;
+        }
+
         wsReceiverServer.clients.forEach((ws) => {
             ws.send(msg);
         });
@@ -46,6 +51,19 @@ wsReceiverServer.on('connection', (ws) => {
 
     ws.on('close', () => {
         console.log('A receiver has disconnected');
+    });
+
+    ws.on('message', (msg) => {
+        if (msg === "SENDERS_COUNT") {
+            ws.send(wsSenderServer.clients.size);
+            return;
+        }
+
+        wsSenderServer.clients.forEach((ws) => {
+            ws.send(msg);
+        });
+
+        console.log(`Forward message to sender: ${msg}`);
     });
 });
 
