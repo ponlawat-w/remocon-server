@@ -2,6 +2,7 @@ const CONFIG = require('./config.json');
 
 const Express = require('express');
 const Https = require('https');
+const Http = require('http');
 const WebSocketServer = require('ws').Server;
 const URL = require('url');
 const File = require('fs');
@@ -11,7 +12,7 @@ const credentials = {
     cert: File.readFileSync('./ssl/cert.pem')
 };
 
-const senderServer = Https.createServer(credentials, new Express());
+const senderServer = Http.createServer(new Express());
 const receiverServer = Https.createServer(credentials, new Express());
 
 const wsSenderServer = new WebSocketServer({
