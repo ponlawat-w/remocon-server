@@ -2,7 +2,7 @@ const CONFIG = require('./config.json');
 
 const Express = require('express');
 const Https = require('https');
-const Http = require('http');
+// const Http = require('http');
 const WebSocketServer = require('ws').Server;
 const URL = require('url');
 const File = require('fs');
@@ -12,7 +12,8 @@ const credentials = {
     cert: File.readFileSync('./ssl/cert.pem')
 };
 
-const senderServer = Http.createServer(new Express());
+// const senderServer = Http.createServer(new Express());
+const senderServer = Https.createServer(credentials, new Express());
 const receiverServer = Https.createServer(credentials, new Express());
 
 const wsSenderServer = new WebSocketServer({
@@ -24,8 +25,26 @@ const wsReceiverServer = new WebSocketServer({
     path: '/receiver'
 });
 
+wsSenderServer.broadcast = (message) => {
+    wsSenderServer.clients.forEach((client) => {
+        client.send(message);
+    });
+};
+
+wsReceiverServer.broadcast = (message) => {
+    wsReceiverServer.clients.forEach((client) => {
+        client.send(message);
+    });
+};
+
+wsReceiverServer.broadcastAmount = (senderServer) => {
+    const amount = wsReceiverServer.clients.size;
+    senderServer.broadcast(`RECEIVERS=${amount}`);
+};
+
 wsSenderServer.on('connection', (ws) => {
     console.log('A sender has connected');
+    wsReceiverServer.broadcastAmount(wsSenderServer);
 
     ws.on('close', () => {
         console.log('A sender has disconnected');
@@ -37,21 +56,18 @@ wsSenderServer.on('connection', (ws) => {
             return;
         }
 
-        wsReceiverServer.clients.forEach((ws) => {
-            ws.send(msg);
-        });
-
+        wsReceiverServer.broadcast(msg);
         console.log(`Forward message to receiver: ${msg}`);
     });
 });
 
 wsReceiverServer.on('connection', (ws) => {
     console.log('A receiver has connected');
+    wsReceiverServer.broadcastAmount(wsSenderServer);
     
-    ws.token = null;
-
     ws.on('close', () => {
         console.log('A receiver has disconnected');
+        wsReceiverServer.broadcastAmount(wsSenderServer);
     });
 
     ws.on('message', (msg) => {
@@ -60,10 +76,7 @@ wsReceiverServer.on('connection', (ws) => {
             return;
         }
 
-        wsSenderServer.clients.forEach((ws) => {
-            ws.send(msg);
-        });
-
+        wsSenderServer.broadcast(msg);
         console.log(`Forward message to sender: ${msg}`);
     });
 });
