@@ -1,20 +1,11 @@
 const CONFIG = require('./config.json');
 
 const Express = require('express');
-const Https = require('https');
-// const Http = require('http');
+const Http = require('http');
 const WebSocketServer = require('ws').Server;
-const URL = require('url');
-const File = require('fs');
 
-const credentials = {
-    key: File.readFileSync('./ssl/key.pem'),
-    cert: File.readFileSync('./ssl/cert.pem')
-};
-
-// const senderServer = Http.createServer(new Express());
-const senderServer = Https.createServer(credentials, new Express());
-const receiverServer = Https.createServer(credentials, new Express());
+const senderServer = Http.createServer(new Express());
+const receiverServer = Http.createServer(new Express());
 
 const wsSenderServer = new WebSocketServer({
     server: senderServer,
