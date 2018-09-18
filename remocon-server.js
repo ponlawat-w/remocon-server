@@ -4,8 +4,6 @@ const Express = require('express');
 // const Https = require('https');
 const Http = require('http');
 const WebSocketServer = require('ws').Server;
-const URL = require('url');
-const File = require('fs');
 
 // const credentials = {
 //     key: File.readFileSync('./ssl/key.pem'),
