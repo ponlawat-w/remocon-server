@@ -73,6 +73,3 @@ typings/
 .serverless
 
 ssl/*
-sender.js
-receiver.js
-config.json
